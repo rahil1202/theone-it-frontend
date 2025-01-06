@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
-export default function SignupForm() {
+const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -84,13 +85,16 @@ export default function SignupForm() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         toast.success("Signup successful! Redirecting to OTP verification...");
@@ -121,24 +125,24 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
+    <div className="flex items-center justify-center min-h-screen bg-black">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-lg shadow-lg p-8"
+        className="w-full max-w-md bg-gray-900 rounded-lg shadow-xl p-8"
         autoComplete="on"
       >
-        <h2 className="text-3xl font-semibold text-center text-blue-600 mb-6">
-          Create an Account
+        <h2 className="text-3xl font-extrabold text-center text-yellow-500 mb-6">
+          Create Your Account
         </h2>
 
         {/* API Error Message */}
         {errors.apiError && (
-          <p className="text-red-600 text-center mb-4">{errors.apiError}</p>
+          <p className="text-red-500 text-center mb-4">{errors.apiError}</p>
         )}
 
         {/* Name Field */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Name
           </label>
           <input
@@ -147,8 +151,8 @@ export default function SignupForm() {
             value={formData.name}
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
-              errors.name ? "border-red-500" : "border-gray-300"
-            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              errors.name ? "border-red-500" : "border-gray-700"
+            } rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none`}
             placeholder="Enter your name"
             autoComplete="name"
           />
@@ -158,8 +162,8 @@ export default function SignupForm() {
         </div>
 
         {/* Email Field */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Email
           </label>
           <input
@@ -168,8 +172,8 @@ export default function SignupForm() {
             value={formData.email}
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              errors.email ? "border-red-500" : "border-gray-700"
+            } rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none`}
             placeholder="Enter your email"
             autoComplete="email"
           />
@@ -179,8 +183,8 @@ export default function SignupForm() {
         </div>
 
         {/* Phone Number Field */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Phone Number
           </label>
           <input
@@ -189,8 +193,8 @@ export default function SignupForm() {
             value={formData.phoneNumber}
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
-              errors.phoneNumber ? "border-red-500" : "border-gray-300"
-            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              errors.phoneNumber ? "border-red-500" : "border-gray-700"
+            } rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none`}
             placeholder="Enter your phone number"
             autoComplete="tel"
           />
@@ -200,8 +204,8 @@ export default function SignupForm() {
         </div>
 
         {/* Password Field */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Password
           </label>
           <input
@@ -210,8 +214,8 @@ export default function SignupForm() {
             value={formData.password}
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              errors.password ? "border-red-500" : "border-gray-700"
+            } rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none`}
             placeholder="Enter your password"
             autoComplete="new-password"
           />
@@ -224,19 +228,19 @@ export default function SignupForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full py-2 rounded-md transition-colors font-semibold text-white ${
-            isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+          className={`w-full py-3 rounded-md transition-colors font-semibold text-black bg-yellow-500 hover:bg-yellow-600 ${
+            isLoading ? "cursor-not-allowed opacity-50" : ""
           }`}
         >
           {isLoading ? "Submitting..." : "Sign Up"}
         </button>
 
         {/* Link to Login */}
-        <p className="text-center text-sm text-gray-600 mt-4">
+        <p className="text-center text-sm text-gray-400 mt-6">
           Already have an account?{" "}
           <a
             href="/login"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-yellow-500 hover:underline font-medium"
           >
             Log In
           </a>
@@ -246,4 +250,6 @@ export default function SignupForm() {
       <ToastContainer />
     </div>
   );
-}
+};
+
+export default Signup;

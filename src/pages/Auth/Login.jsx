@@ -3,8 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
-
-function Login() {
+const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -41,21 +40,24 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include", // To allow cookies (refresh token)
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("user", JSON.stringify({ email: formData.email }));
         toast.success("Login successful! Redirecting to dashboard...");
-        navigate("/dashboard"); // Redirect to dashboard
+        navigate("/dashboard");
       } else {
         const errorData = await response.json();
         setErrors({ apiError: errorData.message || "Invalid credentials" });
@@ -77,23 +79,23 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
+    <div className="flex items-center justify-center min-h-screen bg-black">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm bg-white rounded-lg shadow-lg p-6"
+        className="w-full max-w-md bg-gray-900 rounded-lg shadow-xl p-8"
       >
-        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
+        <h2 className="text-3xl font-extrabold text-center text-yellow-500 mb-6">
           Welcome Back
         </h2>
 
         {/* API Error Message */}
         {errors.apiError && (
-          <p className="text-red-600 text-center mb-4">{errors.apiError}</p>
+          <p className="text-red-500 text-center mb-4">{errors.apiError}</p>
         )}
 
         {/* Email Field */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Email
           </label>
           <input
@@ -102,8 +104,8 @@ function Login() {
             value={formData.email}
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            } rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+              errors.email ? "border-red-500" : "border-gray-700"
+            } rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none`}
             placeholder="Enter your email"
             autoComplete="email"
           />
@@ -113,8 +115,8 @@ function Login() {
         </div>
 
         {/* Password Field */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Password
           </label>
           <input
@@ -123,8 +125,8 @@ function Login() {
             value={formData.password}
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            } rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+              errors.password ? "border-red-500" : "border-gray-700"
+            } rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none`}
             placeholder="Enter your password"
             autoComplete="current-password"
           />
@@ -134,10 +136,10 @@ function Login() {
         </div>
 
         {/* Forgot Password Link */}
-        <div className="text-right mb-4">
+        <div className="text-right mb-6">
           <a
             href="/forgot-password"
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-yellow-500 hover:underline"
           >
             Forgot Password?
           </a>
@@ -147,7 +149,7 @@ function Login() {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition ${
+          className={`w-full py-3 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-600 transition ${
             isLoading ? "cursor-not-allowed opacity-50" : ""
           }`}
         >
@@ -155,11 +157,11 @@ function Login() {
         </button>
 
         {/* Sign Up Link */}
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-gray-400">
           Don’t have an account?{" "}
           <a
             href="/signup"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-yellow-500 hover:underline font-medium"
           >
             Sign Up
           </a>
@@ -169,6 +171,6 @@ function Login() {
       <ToastContainer />
     </div>
   );
-}
+};
 
 export default Login;

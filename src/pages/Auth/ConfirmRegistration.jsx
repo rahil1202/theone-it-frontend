@@ -2,16 +2,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
-
-export default function ConfirmRegistration() {
+const ConfirmRegistration = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const email = location.state?.email; // Access the passed email 
-  console.log(email);
+  const email = location.state?.email; // Access the passed email
 
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,13 +20,16 @@ export default function ConfirmRegistration() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/confirm-registration`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, otp }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/confirm-registration`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, otp }),
+        }
+      );
 
       if (response.ok) {
         toast.success("OTP verified successfully!");
@@ -47,21 +47,21 @@ export default function ConfirmRegistration() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
+    <div className="flex items-center justify-center min-h-screen bg-black">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-lg shadow-lg p-8"
+        className="w-full max-w-md bg-gray-900 rounded-lg shadow-xl p-8"
       >
-        <h2 className="text-3xl font-semibold text-center text-blue-600 mb-6">
+        <h2 className="text-3xl font-extrabold text-center text-yellow-500 mb-6">
           Verify OTP
         </h2>
-        <p className="text-center text-gray-600 mb-4">
-          An OTP has been sent to <strong>{email}</strong>
+        <p className="text-center text-gray-400 mb-4">
+          An OTP has been sent to <strong className="text-yellow-500">{email}</strong>
         </p>
 
         {/* OTP Input */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             OTP
           </label>
           <input
@@ -69,7 +69,7 @@ export default function ConfirmRegistration() {
             name="otp"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
             placeholder="Enter OTP"
           />
         </div>
@@ -78,8 +78,8 @@ export default function ConfirmRegistration() {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full py-2 rounded-md transition-colors font-semibold text-white ${
-            isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+          className={`w-full py-3 rounded-md transition-colors font-semibold text-black bg-yellow-500 hover:bg-yellow-600 ${
+            isLoading ? "cursor-not-allowed opacity-50" : ""
           }`}
         >
           {isLoading ? "Verifying..." : "Verify OTP"}
@@ -89,4 +89,6 @@ export default function ConfirmRegistration() {
       <ToastContainer />
     </div>
   );
-}
+};
+
+export default ConfirmRegistration;
