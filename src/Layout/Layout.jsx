@@ -1,13 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "../Pages/Home/HomePage"
+import Home from "../Pages/Home";
 import Signup from "../Pages/Auth/Signup";
 import ConfirmRegistration from "../Pages/Auth/ConfirmRegistration";
 import Login from "../Pages/Auth/Login";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
 import VerifyOtp from "../Pages/Auth/VerifyOtp";
 import ResetPassword from "../Pages/Auth/ResetPassword";
-
-
 
 const Layout = ()  => {
    return (
