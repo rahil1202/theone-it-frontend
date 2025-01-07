@@ -8,11 +8,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   // console.log("ProtectedRoute - Role:", userRole);
 
   if (!isAuthenticated) {
-    return <Navigate to="/signup" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (!allowedRoles.includes(userRole)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

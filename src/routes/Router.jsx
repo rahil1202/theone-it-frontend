@@ -7,10 +7,12 @@ import Login from "../Pages/Auth/Login";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
 import VerifyOtp from "../Pages/Auth/VerifyOtp";
 import ResetPassword from "../Pages/Auth/ResetPassword";
-import DashboardHome from "../Pages/Users/Dashboard/DashboardHome";
-// import Profile from "../Pages/Dashboard/Profile";
+import DashboardHome from "../Pages/Users/Dashboard/Home";
+import Sidebar from "../Pages/Users/Dashboard/Sidebar";
+import Profile from "../Pages/Users/Dashboard/Profile";
+import History from "../Pages/Users/Dashboard/History";
 // import Settings from "../Pages/Dashboard/Settings";
-// import Attendance from "../Pages/Dashboard/Attendance";
+import Attendance from "../Pages/Users/Dashboard/Attendance";
 
 const AppRouter = () => {
   return ( 
@@ -31,10 +33,39 @@ const AppRouter = () => {
           path="/dashboard/home"
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
+               <Sidebar isActive="Home"/>
               <DashboardHome />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/profile"
+          element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <Sidebar isActive="Profile" />
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/attendance"
+          element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <Sidebar isActive="Attendance" />
+              <Attendance />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/dashboard/history"
+          element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <Sidebar isActive="History" />
+              <History />
+            </ProtectedRoute>
+          }
+        />
+        
                      
         </Routes>
   );
