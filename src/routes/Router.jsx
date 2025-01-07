@@ -11,7 +11,7 @@ import DashboardHome from "../Pages/Users/Dashboard/Home";
 import Sidebar from "../Pages/Users/Dashboard/Sidebar";
 import Profile from "../Pages/Users/Dashboard/Profile";
 import History from "../Pages/Users/Dashboard/History";
-// import Settings from "../Pages/Dashboard/Settings";
+import Settings from "../Pages/Users/Dashboard/Settings";
 import Attendance from "../Pages/Users/Dashboard/Attendance";
 
 const AppRouter = () => {
@@ -65,9 +65,17 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
-        
+         <Route
+          path="/dashboard/settings"
+          element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <Sidebar isActive="Settings" />
+              <Settings />
+            </ProtectedRoute>
+          }
+        />        
                      
-        </Routes>
+      </Routes>
   );
 };
 

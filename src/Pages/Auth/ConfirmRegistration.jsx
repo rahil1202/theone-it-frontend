@@ -33,7 +33,7 @@ const ConfirmRegistration = () => {
 
       if (response.ok) {
         toast.success("OTP verified successfully!");
-        navigate("/dashboard"); // Navigate to a dashboard or home page after successful verification
+        navigate("/login");
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Invalid OTP");

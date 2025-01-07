@@ -91,7 +91,7 @@ const MonthlyAttendance = () => {
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Clock className="w-6 h-6 text-indigo-500" />
-            <h3 className="text-lg font-semibold text-gray-200">Total Work Hours</h3>
+            <h3 className="text-lg font-semibold text-gray-200">Total Work Hours for Month</h3>
           </div>
           <p className="text-gray-400">{totalWorkHours}</p>
         </div>

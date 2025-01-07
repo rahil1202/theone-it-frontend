@@ -173,7 +173,7 @@ const Login = () => {
         </p>
       </form>
 
-      <ToastContainer />
+      <ToastContainer theme="dark" limit={1} pauseOnHover={false} setTimeout={1000} />
     </div>
   );
 };
