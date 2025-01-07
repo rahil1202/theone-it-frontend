@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { useAuth } from "../../Contexts/AuthContext"; // Import useAuth from your AuthContext
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth(); // Access the login function from AuthContext
 
   const validateForm = () => {
     const newErrors = {};
@@ -53,11 +55,14 @@ const Login = () => {
       );
 
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("user", JSON.stringify({ email: formData.email }));
+        const result = await response.json();
+        // Use the login function from AuthContext
+        // console.log(result.token, result.role, result._id, result.email);
+        login(result.token, result.role, result._id, result.email);
         toast.success("Login successful! Redirecting to dashboard...");
-        navigate("/dashboard");
+        setTimeout(() => {
+          navigate("/dashboard/home");
+        }, 1000);
       } else {
         const errorData = await response.json();
         setErrors({ apiError: errorData.message || "Invalid credentials" });
