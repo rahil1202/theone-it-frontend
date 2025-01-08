@@ -9,10 +9,10 @@ import VerifyOtp from "../Pages/Auth/VerifyOtp";
 import ResetPassword from "../Pages/Auth/ResetPassword";
 import DashboardHome from "../Pages/Users/Dashboard/Home";
 import Sidebar from "../Pages/Users/Dashboard/Sidebar";
-import Profile from "../Pages/Users/Dashboard/Profile";
 import History from "../Pages/Users/Dashboard/History";
 import Settings from "../Pages/Users/Dashboard/Settings";
 import Attendance from "../Pages/Users/Dashboard/Attendance";
+import Holidays from "../Pages/Users/Dashboard/Holidays";
 
 const AppRouter = () => {
   return ( 
@@ -37,16 +37,7 @@ const AppRouter = () => {
               <DashboardHome />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/dashboard/profile"
-          element={
-            <ProtectedRoute allowedRoles={["employee"]}>
-              <Sidebar isActive="Profile" />
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        />        
         <Route
           path="/dashboard/attendance"
           element={
@@ -65,6 +56,15 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+         <Route
+          path="/dashboard/holidays"
+          element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <Sidebar isActive="holidays" />
+              <Holidays />
+            </ProtectedRoute>
+          }
+        />       
          <Route
           path="/dashboard/settings"
           element={

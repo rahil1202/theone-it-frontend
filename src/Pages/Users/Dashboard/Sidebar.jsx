@@ -1,19 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { User, Settings, Calendar, HistoryIcon, Home as HomeIcon, Menu, X, LogOut } from "lucide-react";
+import {  Settings, CalendarPlus, CalendarOff ,HistoryIcon, Home as HomeIcon, Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "../../../Contexts/AuthContext";
 
 const Sidebar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   const menuItems = [
     { name: "Home", icon: <HomeIcon className="w-5 h-5" />, path: "/dashboard/home" },
-    { name: "Profile", icon: <User className="w-5 h-5" />, path: "/dashboard/profile" },
-    { name: "Attendance", icon: <Calendar className="w-5 h-5" />, path: "/dashboard/attendance" },
-    { name: "Settings", icon: <Settings className="w-5 h-5" />, path: "/dashboard/settings" },
+    // { name: "Profile", icon: <User className="w-5 h-5" />, path: "/dashboard/profile" },
+    { name: "Attendance", icon: <CalendarPlus className="w-5 h-5" />, path: "/dashboard/attendance" },    
     { name: "History", icon: <HistoryIcon className="w-5 h-5" />, path: "/dashboard/history" },
+    { name: "Holidays", icon: <CalendarOff className="w-5 h-5" />, path: "/dashboard/holidays" },
+    { name: "Settings", icon: <Settings className="w-5 h-5" />, path: "/dashboard/settings" },
+    
   ];
 
   const handleLogout = () => {
@@ -21,12 +23,22 @@ const Sidebar = () => {
     navigate("/login");
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+    // Automatically close the sidebar after 1.5 seconds
+    if (!isSidebarOpen) {
+      setTimeout(() => {
+        setIsSidebarOpen(false);
+      }, 1500); // Close after 1.5 seconds
+    }
+  };
+
   return (
-    <div className="relative flex bg-gray-100">
+    <>
       {/* Sidebar */}
       <div
-        className={`fixed bg-gradient-to-b from-gray-900 to-gray-800 text-gray-200 shadow-xl h-full
-          ${isSidebarOpen ? "w-64" : "w-20"} 
+        className={`fixed bg-gradient-to-b from-gray-900 to-gray-800 text-gray-200 shadow-xl h-full top-0 left-0 z-50
+          ${isSidebarOpen ? "w-64" : "w-20 overflow-hidden"} 
           transition-all duration-300 ease-in-out flex flex-col`}
       >
         {/* Sidebar Header */}
@@ -38,7 +50,7 @@ const Sidebar = () => {
             Dashboard
           </h2>
           <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            onClick={toggleSidebar}
             className="p-2 rounded-lg hover:bg-gray-700 transition-colors"
           >
             {isSidebarOpen ? (
@@ -55,6 +67,7 @@ const Sidebar = () => {
             <NavLink
               to={item.path}
               key={index}
+              onClick={() => setIsSidebarOpen(false)} // Close the sidebar when navigating
               className={({ isActive }) =>
                 `flex items-center px-3 py-2 rounded-lg transition-all duration-200 group
                 ${
@@ -98,9 +111,16 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
+
       {/* Main Content */}
-      
-    </div>
+      {/* <div
+        className={`flex-1 bg-gray-100 transition-all duration-300 ${
+          isSidebarOpen ? "ml-64" : "ml-20"
+        }`}
+      >
+        {/* Add your main content here */}
+      {/* </div> */} 
+    </>
   );
 };
 

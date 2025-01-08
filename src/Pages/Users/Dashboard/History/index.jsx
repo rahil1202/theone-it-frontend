@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, Clock, CheckSquare } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const MonthlyAttendance = () => {
   const [records, setRecords] = useState([]);
-  const [totalWorkHours, setTotalWorkHours] = useState("0 minutes");
+  const [totalWorkHours, setTotalWorkHours] = useState(0); // in minutes
   const [month, setMonth] = useState(new Date().getMonth() + 1); // Default to current month
   const [year, setYear] = useState(new Date().getFullYear()); // Default to current year
   const [loading, setLoading] = useState(false);
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const employeeId = localStorage.getItem("_id"); // Assuming employee ID is stored in local storage
+
+  // Function to convert minutes to "hours and minutes"
+  const formatTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours} hours ${remainingMinutes} minutes`;
+  };
 
   const fetchMonthlyAttendance = async () => {
     setLoading(true);
@@ -27,7 +33,11 @@ const MonthlyAttendance = () => {
 
       const data = await response.json();
       setRecords(data.records || []);
-      setTotalWorkHours(data.totalWorkHours || "0 minutes");
+
+      // Extract numerical value from the "totalWorkHours" string
+      const totalMinutes = parseInt(data.totalWorkHours.split(" ")[0], 10) || 0;
+      setTotalWorkHours(totalMinutes);
+
       toast.success(data.message || "Monthly attendance fetched successfully");
     } catch (error) {
       console.error("Error fetching monthly attendance:", error);
@@ -63,9 +73,9 @@ const MonthlyAttendance = () => {
             className="p-2 rounded-lg bg-gray-800 text-white border border-gray-700"
           >
             {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>{
-                new Date(0, i).toLocaleString("default", { month: "long" })
-              }</option>
+              <option key={i + 1} value={i + 1}>
+                {new Date(0, i).toLocaleString("default", { month: "long" })}
+              </option>
             ))}
           </select>
           <input
@@ -93,7 +103,7 @@ const MonthlyAttendance = () => {
             <Clock className="w-6 h-6 text-indigo-500" />
             <h3 className="text-lg font-semibold text-gray-200">Total Work Hours for Month</h3>
           </div>
-          <p className="text-gray-400">{totalWorkHours}</p>
+          <p className="text-gray-400">{formatTime(totalWorkHours)}</p>
         </div>
 
         {/* Attendance Records */}
@@ -109,7 +119,7 @@ const MonthlyAttendance = () => {
                   <th className="text-left py-2">Check-in Time</th>
                   <th className="text-left py-2">Check-out Time</th>
                   <th className="text-left py-2">Break Duration</th>
-                  <th className="text-left py-2">Status</th>
+                  <th className="text-left py-2">Total Working Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,7 +141,11 @@ const MonthlyAttendance = () => {
                         ? `${Math.floor(record.totalRecessDuration / 60000)} minutes`
                         : "0 minutes"}
                     </td>
-                    <td className="py-2">{record.currentStatus}</td>
+                    <td className="py-2">
+                      {record.totalWorkingTime
+                        ? formatTime(record.totalWorkingTime)
+                        : "0 hours 0 minutes"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
