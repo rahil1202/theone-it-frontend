@@ -9,6 +9,7 @@ const Attendance = () => {
   const [checkOutTime, setCheckOutTime] = useState(null);
   const [totalRecessDuration, setTotalRecessDuration] = useState("0 minutes");
   const [totalWorkingTime, setTotalWorkingTime] = useState("0 minutes");
+  const [liveWorkingTime, setLiveWorkingTime] = useState("0 minutes");
   const [loading, setLoading] = useState(false);
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -27,6 +28,7 @@ const Attendance = () => {
       setCheckOutTime(data.checkOutTime);
       setTotalRecessDuration(data.totalRecessDuration || "0 minutes");
       setTotalWorkingTime(data.totalWorkingTime || "0 minutes");
+      setLiveWorkingTime(data.liveWorkingTime || "0 minutes");
     } catch (error) {
       console.error("Error fetching attendance status:", error);
       toast.error(error.message || "Failed to fetch attendance status.");
@@ -52,7 +54,6 @@ const Attendance = () => {
       const { attendance, message } = await response.json();
 
       setStatus(attendance.currentStatus || "No status available");
-      console.log(attendance.currentStatus);
       setCheckInTime(attendance.checkInTime);
       setCheckOutTime(attendance.checkOutTime);
       setTotalRecessDuration(
@@ -60,6 +61,8 @@ const Attendance = () => {
           ? `${Math.floor(attendance.totalRecessDuration / 60000)} minutes`
           : "0 minutes"
       );
+
+      setLiveWorkingTime(attendance.liveWorkingTime || "0 minutes");
 
       const totalWorkingTime =
         attendance.checkOutTime && attendance.checkInTime
@@ -86,6 +89,16 @@ const Attendance = () => {
       setLoading(false);
     }
   };
+
+  // Update live working time every minute if user is checked in
+  useEffect(() => {
+    if (status === "Checked In") {
+      const interval = setInterval(() => {
+        fetchAttendanceStatus();
+      }, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [status]);
 
   useEffect(() => {
     fetchAttendanceStatus();
@@ -177,11 +190,11 @@ const Attendance = () => {
           </div>
         </div>
 
-        {/* Working Time */}
+        {/* Live Working Time */}
         <div className="mt-8 bg-gray-800 rounded-xl p-6 border border-gray-700 backdrop-blur-lg hover:scale-105 transform transition-all duration-300">
-          <Timer className="w-5 h-5 text-blue-500 mb-2" />
-          <h3 className="text-lg font-semibold text-gray-200">Working Duration</h3>
-          <p className="text-gray-400">{totalWorkingTime}</p>
+          <Timer className="w-5 h-5 text-indigo-500 mb-2" />
+          <h3 className="text-lg font-semibold text-gray-200">Live Working Time</h3>
+          <p className="text-gray-400">{liveWorkingTime}</p>
         </div>
 
         {/* Action Buttons */}
