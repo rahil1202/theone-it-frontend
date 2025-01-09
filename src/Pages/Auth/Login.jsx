@@ -60,9 +60,17 @@ const Login = () => {
         // console.log(result.token, result.role, result._id, result.email);
         login(result.token, result.role, result._id, result.email);
         toast.success("Login successful! Redirecting to dashboard...");
+        if(result.role === "admin") {
+          setTimeout(() => {
+            navigate("/admin/dashboard/home");
+          }, 1000);
+          return;
+        }        
+        else if(result.role === "employee") {
         setTimeout(() => {
-          navigate("/dashboard/home");
+          navigate("/employee/dashboard/home");
         }, 1000);
+      }
       } else {
         const errorData = await response.json();
         setErrors({ apiError: errorData.message || "Invalid credentials" });

@@ -7,12 +7,21 @@ import Login from "../Pages/Auth/Login";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
 import VerifyOtp from "../Pages/Auth/VerifyOtp";
 import ResetPassword from "../Pages/Auth/ResetPassword";
+// Employee Route 
+import EmployeeSidebar from "../Pages/Users/Dashboard/Sidebar";
 import DashboardHome from "../Pages/Users/Dashboard/Home";
-import Sidebar from "../Pages/Users/Dashboard/Sidebar";
 import History from "../Pages/Users/Dashboard/History";
 import Settings from "../Pages/Users/Dashboard/Settings";
 import Attendance from "../Pages/Users/Dashboard/Attendance";
 import Holidays from "../Pages/Users/Dashboard/Holidays";
+
+// Admin Route
+import AdminSidebar from "../Pages/Admins/Dashboard/Sidebar";
+import AdminDashboardHome from "../Pages/Admins/Dashboard/Home";
+import AdminSettings from "../Pages/Admins/Dashboard/Settings";
+import AdminHolidays from "../Pages/Admins/Dashboard/Holidays";
+import AdminManageEmployees from "../Pages/Admins/Dashboard/Employees";
+
 
 const AppRouter = () => {
   return ( 
@@ -30,51 +39,89 @@ const AppRouter = () => {
 
           {/* Private Routes */}
           <Route
-          path="/dashboard/home"
+          path="/employee/dashboard/home"
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
-               <Sidebar isActive="Home"/>
+               <EmployeeSidebar isActive="Home"/>
               <DashboardHome />
             </ProtectedRoute>
           }
         />        
         <Route
-          path="/dashboard/attendance"
+          path="/employee/dashboard/attendance"
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
-              <Sidebar isActive="Attendance" />
+              <EmployeeSidebar isActive="Attendance" />
               <Attendance />
             </ProtectedRoute>
           }
         />
          <Route
-          path="/dashboard/history"
+          path="/employee/dashboard/history"
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
-              <Sidebar isActive="History" />
+              <EmployeeSidebar isActive="History" />
               <History />
             </ProtectedRoute>
           }
         />
          <Route
-          path="/dashboard/holidays"
+          path="/employee/dashboard/holidays"
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
-              <Sidebar isActive="holidays" />
+              <EmployeeSidebar isActive="holidays" />
               <Holidays />
             </ProtectedRoute>
           }
         />       
          <Route
-          path="/dashboard/settings"
+          path="/employee/dashboard/settings"
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
-              <Sidebar isActive="Settings" />
+              <EmployeeSidebar isActive="Settings" />
               <Settings />
             </ProtectedRoute>
           }
-        />        
-                     
+        />
+
+         {/* Admin Routes */}
+
+          <Route
+          path="/admin/dashboard/home"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Home" />
+              <AdminDashboardHome />
+            </ProtectedRoute> 
+          }
+        />
+        <Route 
+          path="/admin/dashboard/settings"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Settings" />
+              <AdminSettings />
+            </ProtectedRoute>
+          }
+        /> 
+        <Route 
+          path="/admin/dashboard/holidays"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Holidays" />
+              <AdminHolidays />
+            </ProtectedRoute>
+          }
+        /> 
+        <Route 
+          path="/admin/dashboard/employees"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Employees" />
+              <AdminManageEmployees />
+            </ProtectedRoute>
+          }                 
+        />
       </Routes>
   );
 };

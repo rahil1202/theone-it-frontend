@@ -7,6 +7,7 @@ const Settings = () => {
     name: "",
     email: "",
     phoneNumber: "",
+    jobRole: "",
     dateofBirth: "",
     aadharNumber: "",
     panNumber: "",
@@ -40,6 +41,7 @@ const Settings = () => {
         name: employee.name || "",
         email: employee.email || "",
         phoneNumber: employee.phoneNumber || "",
+        jobRole: employee.jobRole || "",
         dateofBirth: formatteddateofBirth,
         aadharNumber: employee.aadharNumber || "",
         panNumber: employee.panNumber || "",
@@ -99,6 +101,7 @@ const Settings = () => {
         name: employee.name || "",
         email: employee.email || "",
         phoneNumber: employee.phoneNumber || "",
+        jobRole: employee.jobRole || "",
         dateofBirth: formatteddateofBirth,
         aadharNumber: employee.aadharNumber || "",
         panNumber: employee.panNumber || "",
@@ -173,6 +176,19 @@ const Settings = () => {
               className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
               placeholder="Enter your phone number"
               required
+            />
+          </div>
+
+          {/* Job Role */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Job Role</label>
+            <input
+              type="text"
+              name="jobRole"
+              value={formData.jobRole}
+              onChange={handleChange}
+              className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
+              placeholder="Enter your job role"
             />
           </div>
 

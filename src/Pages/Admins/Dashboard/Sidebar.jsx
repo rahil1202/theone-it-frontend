@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   Settings,
-  CalendarPlus,
-  CalendarOff,
+  CalendarFold,
+  BarChart2,
+  Users,
+  FileText,
   HistoryIcon,
   Home as HomeIcon,
   Menu,
@@ -12,17 +14,19 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../../Contexts/AuthContext";
 
-const EmployeeSidebar = () => {
+const AdminSidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   const menuItems = [
-    { name: "Home", icon: <HomeIcon className="w-5 h-5" />, path: "/employee/dashboard/home" },
-    { name: "Attendance", icon: <CalendarPlus className="w-5 h-5" />, path: "/employee/dashboard/attendance" },
-    { name: "History", icon: <HistoryIcon className="w-5 h-5" />, path: "/employee/dashboard/history" },
-    { name: "Holidays", icon: <CalendarOff className="w-5 h-5" />, path: "/employee/dashboard/holidays" },
-    { name: "Settings", icon: <Settings className="w-5 h-5" />, path: "/employee/dashboard/settings" },
+    { name: "Home", icon: <HomeIcon className="w-5 h-5" />, path: "/admin/dashboard/home" },
+    { name: "Attendance", icon: <BarChart2 className="w-5 h-5" />, path: "/admin/dashboard/attendance" },
+    { name: "Manage Employees", icon: <Users className="w-5 h-5" />, path: "/admin/dashboard/employees" },
+    { name: "Leave Requests", icon: <FileText className="w-5 h-5" />, path: "/admin/dashboard/leave-requests" },
+    { name: "History", icon: <HistoryIcon className="w-5 h-5" />, path: "/admin/dashboard/history" },
+    { name: "Manage Holidays", icon: <CalendarFold className="w-5 h-5" />, path: "/admin/dashboard/holidays" },    
+    { name: "Settings", icon: <Settings className="w-5 h-5" />, path: "/admin/dashboard/settings" },
   ];
 
   const handleLogout = () => {
@@ -53,7 +57,7 @@ const EmployeeSidebar = () => {
             className={`font-bold text-gray-100 text-lg transition-opacity duration-300
               ${isSidebarOpen ? "opacity-100" : "opacity-0 w-0"}`}
           >
-            Dashboard
+            Admin Dashboard
           </h2>
           <button
             onClick={toggleSidebar}
@@ -83,7 +87,7 @@ const EmployeeSidebar = () => {
                 }`
               }
             >
-              {/* Tooltip */}
+               {/* Tooltip */}
               {!isSidebarOpen && (
                 <span
                   className="fixed left-14 bg-gray-800 text-white text-xs font-medium px-2 py-1 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
@@ -126,4 +130,4 @@ const EmployeeSidebar = () => {
   );
 };
 
-export default EmployeeSidebar;
+export default AdminSidebar;
