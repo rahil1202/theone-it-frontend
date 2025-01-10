@@ -45,12 +45,7 @@ const Attendance = () => {
   };
 
   const handleAttendanceAction = async (action) => {
-    if (action === "checkout") {
-      setShowDialog(true);
-      setTimeLeft(10);
-      return;
-    }
-
+   
     setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/attendance/${action}`, {
@@ -105,48 +100,70 @@ const Attendance = () => {
     }
   };
 
-  const initiateCheckout = () => {
-    const timeout = setTimeout(() => {
-      handleAttendanceAction("checkout");
-      setShowDialog(false);
-    }, 10000);
-    
-    setCheckoutTimeout(timeout);
-    toast.info("Checkout will be processed in 10 seconds. Click 'Cancel' to undo.", {
-      autoClose: 10000,
-    });
-  };
+// const initiateCheckout = () => {
+//   const timeout = setTimeout(() => {
+//     // Trigger checkout after 10 seconds
+//     handleAttendanceAction("checkout");
+//     setShowDialog(false); // Close the dialog after checkout is triggered
+//   }, 10000);
+  
+//   setCheckoutTimeout(timeout);
+//   toast.info("Checkout will be processed in 10 seconds. Click 'Cancel' to undo.", {
+//     autoClose: 10000,
+//   });
+// };
 
-  const cancelCheckout = () => {
-    clearTimeout(checkoutTimeout);
-    setShowDialog(false);
-    setTimeLeft(10);
-    toast.info("Checkout canceled.");
-  };
+// const cancelCheckout = () => {
+//   clearTimeout(checkoutTimeout); // Clear the timeout to prevent checkout
+//   setShowDialog(false); // Close the dialog
+//   setTimeLeft(10); // Reset the timer
+//   toast.info("Checkout canceled.");
+// };
 
-  useEffect(() => {
-    let timer;
-    if (showDialog && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
-    }
-    
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [showDialog, timeLeft]);
+// useEffect(() => {
+//   let timer;
+//   if (showDialog && timeLeft > 0) {
+//     timer = setInterval(() => {
+//       setTimeLeft((prevTime) => prevTime - 1);
+//     }, 1000);
+//   }
 
-  useEffect(() => {
-    if (showDialog) {
-      initiateCheckout();
-    }
-    return () => {
-      if (checkoutTimeout) {
-        clearTimeout(checkoutTimeout);
-      }
-    };
-  }, [showDialog]);
+//   if (timeLeft === 0) {
+//     // Trigger checkout when timeLeft reaches 0
+//     handleAttendanceAction("checkout");
+//     setShowDialog(false); // Close the dialog when checkout happens
+//   }
+
+//   return () => {
+//     if (timer) clearInterval(timer); // Cleanup the timer on unmount
+//   };
+// }, [showDialog, timeLeft]);
+
+// useEffect(() => {
+//   if (showDialog) {
+//     // Start countdown and checkout process when dialog is shown
+//     initiateCheckout();
+//   }
+
+//   return () => {
+//     // Cleanup timeout when dialog is closed or unmounted
+//     if (checkoutTimeout) {
+//       clearTimeout(checkoutTimeout);
+//     }
+//   };
+// }, [showDialog]);
+
+
+//   useEffect(() => {
+//     if (showDialog) {
+//       initiateCheckout();
+//     }
+//     return () => {
+//       if (checkoutTimeout) {
+//         clearTimeout(checkoutTimeout);
+//       }
+//     };
+//   }, [showDialog]);
 
   useEffect(() => {
     if (status === "Checked In") {
@@ -310,7 +327,7 @@ const Attendance = () => {
           ))}
         </div>
 
-        {/* Checkout Dialog */}
+        {/* Checkout Dialog
         {showDialog && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-sm" />
@@ -342,7 +359,7 @@ const Attendance = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Status Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
