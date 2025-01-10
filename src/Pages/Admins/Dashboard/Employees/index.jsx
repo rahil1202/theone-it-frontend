@@ -5,6 +5,7 @@ import {
   Filter, ChevronDown, ExternalLink, ArrowLeft,
   Users, Building2
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const AdminManageEmployees = () => {
   const [employees, setEmployees] = useState([]);
@@ -249,12 +250,11 @@ const EmployeeCard = ({ employee }) => (
         </div>
       </div>
       
-      <button className="mt-6 w-full px-4 py-2 bg-gray-900 hover:bg-gray-700 rounded-lg
-                        flex items-center justify-center gap-2 transition-colors duration-200
-                        group-hover:bg-indigo-600">
+      <Link to = {`/admin/dashboard/employees/${employee._id}`}  className="mt-6 w-full px-4 py-2 bg-gray-900 hover:bg-gray-700 rounded-lg
+        flex items-center justify-center gap-2 transition-colors duration-200  group-hover:bg-indigo-600">      
         <ExternalLink className="w-4 h-4" />
-        View Profile
-      </button>
+        <span>View Profile</span>        
+      </Link>
     </div>
   </div>
 );

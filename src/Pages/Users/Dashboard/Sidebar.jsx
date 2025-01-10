@@ -9,6 +9,7 @@ import {
   Menu,
   X,
   LogOut,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../../../Contexts/AuthContext";
 
@@ -21,6 +22,7 @@ const EmployeeSidebar = () => {
     { name: "Home", icon: <HomeIcon className="w-5 h-5" />, path: "/employee/dashboard/home" },
     { name: "Attendance", icon: <CalendarPlus className="w-5 h-5" />, path: "/employee/dashboard/attendance" },
     { name: "History", icon: <HistoryIcon className="w-5 h-5" />, path: "/employee/dashboard/history" },
+    { name: "Leaves", icon: <FileText className="w-5 h-5" />, path: "/employee/dashboard/leaves" },
     { name: "Holidays", icon: <CalendarOff className="w-5 h-5" />, path: "/employee/dashboard/holidays" },
     { name: "Settings", icon: <Settings className="w-5 h-5" />, path: "/employee/dashboard/settings" },
   ];

@@ -23,8 +23,7 @@ const AdminSidebar = () => {
     { name: "Home", icon: <HomeIcon className="w-5 h-5" />, path: "/admin/dashboard/home" },
     { name: "Attendance", icon: <BarChart2 className="w-5 h-5" />, path: "/admin/dashboard/attendance" },
     { name: "Manage Employees", icon: <Users className="w-5 h-5" />, path: "/admin/dashboard/employees" },
-    { name: "Leave Requests", icon: <FileText className="w-5 h-5" />, path: "/admin/dashboard/leave-requests" },
-    { name: "History", icon: <HistoryIcon className="w-5 h-5" />, path: "/admin/dashboard/history" },
+    { name: "Leave Requests", icon: <FileText className="w-5 h-5" />, path: "/admin/dashboard/leaves" },
     { name: "Manage Holidays", icon: <CalendarFold className="w-5 h-5" />, path: "/admin/dashboard/holidays" },    
     { name: "Settings", icon: <Settings className="w-5 h-5" />, path: "/admin/dashboard/settings" },
   ];

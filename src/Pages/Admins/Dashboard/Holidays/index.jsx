@@ -5,7 +5,6 @@ import {
   AlertCircle, ChevronRight, CalendarDays, 
   CheckCircle2
 } from "lucide-react";
-import "react-toastify/dist/ReactToastify.css";
 
 const AdminHolidays = () => {
   const [holidays, setHolidays] = useState([]);

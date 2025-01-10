@@ -170,7 +170,7 @@ const ResetPassword = () => {
         </button>
       </form>
 
-      <ToastContainer pauseOnHover={false} closeOnClick={false} />
+      <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} autoClose={2000} />
     </div>
   );
 };

@@ -155,7 +155,7 @@ const MonthlyAttendance = () => {
           )}
         </div>
       </div>
-      <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} />
+      <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} autoClose={2000} />
     </div>
   );
 };

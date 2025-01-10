@@ -11,6 +11,7 @@ import ResetPassword from "../Pages/Auth/ResetPassword";
 import EmployeeSidebar from "../Pages/Users/Dashboard/Sidebar";
 import DashboardHome from "../Pages/Users/Dashboard/Home";
 import History from "../Pages/Users/Dashboard/History";
+import Leaves from "../Pages/Users/Dashboard/Leaves";
 import Settings from "../Pages/Users/Dashboard/Settings";
 import Attendance from "../Pages/Users/Dashboard/Attendance";
 import Holidays from "../Pages/Users/Dashboard/Holidays";
@@ -18,9 +19,13 @@ import Holidays from "../Pages/Users/Dashboard/Holidays";
 // Admin Route
 import AdminSidebar from "../Pages/Admins/Dashboard/Sidebar";
 import AdminDashboardHome from "../Pages/Admins/Dashboard/Home";
+import AdminAttendance from "../Pages/Admins/Dashboard/Attendance";
 import AdminSettings from "../Pages/Admins/Dashboard/Settings";
 import AdminHolidays from "../Pages/Admins/Dashboard/Holidays";
 import AdminManageEmployees from "../Pages/Admins/Dashboard/Employees";
+import AdminEmployeeProfile from "../Pages/Admins/Dashboard/Employees/EmployeeProfile";
+import AdminLeaveManagement from "../Pages/Admins/Dashboard/Leaves";
+
 
 
 const AppRouter = () => {
@@ -65,6 +70,15 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+        <Route 
+          path="/employee/dashboard/leaves"
+          element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <EmployeeSidebar isActive="Leaves" />
+              <Leaves />
+            </ProtectedRoute>
+          }
+        />
          <Route
           path="/employee/dashboard/holidays"
           element={
@@ -95,6 +109,24 @@ const AppRouter = () => {
             </ProtectedRoute> 
           }
         />
+        <Route
+          path="/admin/dashboard/attendance"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Attendance" />
+              <AdminAttendance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard/history"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="History" />
+              <History />
+            </ProtectedRoute>
+          }
+        />
         <Route 
           path="/admin/dashboard/settings"
           element={
@@ -122,6 +154,26 @@ const AppRouter = () => {
             </ProtectedRoute>
           }                 
         />
+        <Route 
+          path="/admin/dashboard/employees/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Employees" />
+              <AdminEmployeeProfile />
+            </ProtectedRoute>
+          }                 
+        />
+        <Route 
+          path="/admin/dashboard/leaves"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Leaves" />
+              <AdminLeaveManagement />
+            </ProtectedRoute>
+          }                 
+        />
+
+        
       </Routes>
   );
 };

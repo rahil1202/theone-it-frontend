@@ -13,6 +13,7 @@ import {
   Legend,
 } from "chart.js";
 import { Clock, CheckCircle } from "lucide-react";
+import {toast, ToastContainer} from "react-toastify";
 
 ChartJS.register(
   CategoryScale,
@@ -184,6 +185,7 @@ const DashboardHome = () => {
           </div>
         </div>
       </div>
+      <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} autoClose={2000} />
     </div>
   );
 };
