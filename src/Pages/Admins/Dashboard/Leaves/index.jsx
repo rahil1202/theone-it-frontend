@@ -1,71 +1,84 @@
-import React, { useState } from 'react';
-import { NotebookTabsIcon, Calendar, Mail, AlertCircle, Check, X, Clock, Search, Filter, ArrowUpDown, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  NotebookTabsIcon, Calendar, Mail, AlertCircle, Check, X, 
+  Clock, Search, Filter, ArrowUpDown, ChevronDown, Edit,
+  Loader2, User, Calendar as CalendarIcon, XCircle
+} from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminLeaveManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
-  const [isStatusOpen, setIsStatusOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentLeave, setCurrentLeave] = useState(null);
+  const [newStatus, setNewStatus] = useState('pending');
+  const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 
-  // ... rest of the state and helper functions remain the same ...
-  const [leaveRequests, setLeaveRequests] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@company.com",
-      reason: "Family vacation planned with parents",
-      startDate: "2025-01-15",
-      endDate: "2025-01-20",
-      status: "pending",
-      department: "Engineering"
-    },
-    {
-      id: 2,
-      name: "Sarah Smith",
-      email: "sarah.smith@company.com",
-      reason: "Medical appointment and recovery",
-      startDate: "2025-01-12",
-      endDate: "2025-01-14",
-      status: "accepted",
-      department: "Marketing"
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.johnson@company.com",
-      reason: "Personal emergency",
-      startDate: "2025-01-18",
-      endDate: "2025-01-19",
-      status: "declined",
-      department: "Sales"
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
+  const fetchAllLeaves = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/leaves/get-all`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      if (!response.ok) throw new Error('Failed to fetch leaves.');
+      const { leaves } = await response.json();
+      setLeaveRequests(leaves);
+      toast.success('Leaves fetched successfully');
+    } catch (error) {
+      console.error('Error fetching leaves:', error);
+      toast.error(error.message || 'Failed to fetch leaves');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
-  const handleStatusChange = (id, newStatus) => {
-    setLeaveRequests(prevRequests =>
-      prevRequests.map(request =>
-        request.id === id ? { ...request, status: newStatus } : request
-      )
-    );
+  const updateLeaveStatus = async () => {
+    if (!currentLeave) return;
+    try {
+      const response = await fetch(`${BASE_URL}/leaves/update/${currentLeave._id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) throw new Error('Invalid status update.');
+      const { message } = await response.json();
+      toast.success(message || 'Leave status updated successfully');
+      setLeaveRequests((prevRequests) =>
+        prevRequests.map((request) =>
+          request._id === currentLeave._id ? { ...request, status: newStatus } : request
+        )
+      );
+      setIsSlideOverOpen(false);
+    } catch (error) {
+      console.error('Error updating leave status:', error);
+      toast.error(error.message || 'Failed to update leave status');
+    }
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'accepted':
-        return 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/30';
-      case 'declined':
-        return 'bg-red-500/10 text-red-400 ring-red-500/30';
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return 'bg-emerald-500/20 text-emerald-400 ring-emerald-500/30';
+      case 'rejected':
+        return 'bg-red-500/20 text-red-400 ring-red-500/30';
       default:
-        return 'bg-yellow-500/10 text-yellow-400 ring-yellow-500/30';
+        return 'bg-yellow-500/20 text-yellow-400 ring-yellow-500/30';
     }
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'accepted':
+    switch (status.toLowerCase()) {
+      case 'approved':
         return <Check className="w-4 h-4" />;
-      case 'declined':
+      case 'rejected':
         return <X className="w-4 h-4" />;
       default:
         return <Clock className="w-4 h-4" />;
@@ -73,195 +86,210 @@ const AdminLeaveManagement = () => {
   };
 
   const filteredAndSortedRequests = leaveRequests
-    .filter(request => {
-      const matchesSearch = 
-        request.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        request.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    .filter((request) => {
+      const matchesSearch =
+        request.employeeEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
         request.reason.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
-      
+      const matchesStatus = statusFilter === 'all' || request.status.toLowerCase() === statusFilter;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       if (sortOrder === 'newest') {
         return new Date(b.startDate) - new Date(a.startDate);
-      } else {
-        return new Date(a.startDate) - new Date(b.startDate);
       }
+      return new Date(a.startDate) - new Date(b.startDate);
     });
 
+  useEffect(() => {
+    fetchAllLeaves();
+  }, []);
+
   return (
-    <div className="ml-20 p-6 min-h-screen bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-gray-900 via-gray-800 to-gray-900 text-white">
-      {/* Header Section */}
-      <header className="bg-gray-800/50 backdrop-blur-sm border-b border-white/10 py-6">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <NotebookTabsIcon className="w-8 h-8 text-indigo-500" />
-              <h1 className="text-2xl font-bold">Leave Management</h1>
-            </div>
-            <p className="text-gray-400 hidden md:block">
-              {filteredAndSortedRequests.length} leave requests pending review
-            </p>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-gray-800/50 rounded-2xl p-6 backdrop-blur-sm ring-1 ring-white/10">
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <input 
-                type="text"
-                placeholder="Search requests..."
-                className="pl-9 pr-4 py-2 w-full bg-gray-900/50 rounded-lg ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            {/* Status Filter */}
-            <div className="relative">
-              <button
-                onClick={() => setIsStatusOpen(!isStatusOpen)}
-                className="w-40 px-4 py-2 bg-gray-900/50 rounded-lg ring-1 ring-white/10 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4" />
-                  <span>{statusFilter === 'all' ? 'All Status' : statusFilter}</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="ml-20">
+        {/* Header */}
+        <header className="sticky top-0 z-10 bg-gray-900/80 backdrop-blur-lg border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-2.5 bg-indigo-500/10 rounded-xl">
+                  <NotebookTabsIcon className="w-6 h-6 text-indigo-400" />
                 </div>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              {isStatusOpen && (
-                <div className="absolute top-full mt-2 w-40 bg-gray-900 rounded-lg ring-1 ring-white/10 py-1 z-10">
-                  {['all', 'pending', 'accepted', 'declined'].map((status) => (
-                    <button
-                      key={status}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-800"
-                      onClick={() => {
-                        setStatusFilter(status);
-                        setIsStatusOpen(false);
-                      }}
-                    >
-                      {status === 'all' ? 'All Status' : status}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Sort Order */}
-            <div className="relative">
-              <button
-                onClick={() => setIsSortOpen(!isSortOpen)}
-                className="w-40 px-4 py-2 bg-gray-900/50 rounded-lg ring-1 ring-white/10 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown className="w-4 h-4" />
-                  <span>{sortOrder === 'newest' ? 'Newest' : 'Oldest'}</span>
-                </div>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              {isSortOpen && (
-                <div className="absolute top-full mt-2 w-40 bg-gray-900 rounded-lg ring-1 ring-white/10 py-1 z-10">
-                  {['newest', 'oldest'].map((sort) => (
-                    <button
-                      key={sort}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-800"
-                      onClick={() => {
-                        setSortOrder(sort);
-                        setIsSortOpen(false);
-                      }}
-                    >
-                      {sort === 'newest' ? 'Newest First' : 'Oldest First'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Leave Requests List */}
-          <div className="space-y-4">
-            {filteredAndSortedRequests.map((request) => (
-              <div
-                key={request.id}
-                className="bg-gray-800/30 rounded-xl p-6 ring-1 ring-white/10 hover:ring-indigo-500/50 transition-all duration-300"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                  <div className="space-y-3">
-                    <div>
-                      <h3 className="font-semibold text-lg">{request.name}</h3>
-                      <div className="flex items-center gap-2 text-gray-400">
-                        <Mail className="w-4 h-4" />
-                        <span className="text-sm">{request.email}</span>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      {request.department}
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-2 space-y-3">
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 mt-1 flex-shrink-0 text-gray-400" />
-                      <span className="text-gray-300">{request.reason}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-400">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-sm">
-                        {new Date(request.startDate).toLocaleDateString('en-US', {
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric'
-                        })} - {new Date(request.endDate).toLocaleDateString('en-US', {
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row lg:flex-col justify-start gap-3">
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg ring-1 ${getStatusColor(request.status)}`}>
-                      {getStatusIcon(request.status)}
-                      <span className="capitalize">{request.status}</span>
-                    </div>
-                    
-                    {request.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleStatusChange(request.id, 'accepted')}
-                          className="px-4 py-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-lg ring-1 ring-emerald-500/30 transition-all duration-300"
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(request.id, 'declined')}
-                          className="px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg ring-1 ring-red-500/30 transition-all duration-300"
-                        >
-                          Decline
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-white">Leave Management</h1>
+                  <p className="text-sm text-gray-400 mt-0.5">
+                    {filteredAndSortedRequests.length} total requests
+                  </p>
                 </div>
               </div>
-            ))}
-
-            {filteredAndSortedRequests.length === 0 && (
-              <div className="text-center py-12 text-gray-400">
-                No leave requests match your search criteria
+              <div className="flex items-center space-x-4">
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search requests..."
+                    className="w-full pl-10 pr-4 py-2 bg-gray-800/50 rounded-lg ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-white placeholder-gray-400 transition-all duration-200"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+          ) : filteredAndSortedRequests.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-800/50 mb-4">
+                <AlertCircle className="w-6 h-6 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-300">No leave requests found</h3>
+              <p className="text-gray-500 mt-2">Try adjusting your search criteria</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {filteredAndSortedRequests.map((request) => (
+                <div
+                  key={request._id}
+                  className="group bg-gray-800/40 hover:bg-gray-800/60 rounded-xl ring-1 ring-white/10 hover:ring-indigo-500/50 transition-all duration-300"
+                >
+                  <div className="p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className="p-2 bg-gray-900/50 rounded-lg">
+                            <User className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <h3 className="font-medium text-white">{request.employeeEmail}</h3>
+                        </div>
+                        <div className="flex items-start space-x-3 mb-3">
+                          <div className="p-2 bg-gray-900/50 rounded-lg">
+                            <AlertCircle className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <p className="text-gray-300">{request.reason}</p>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-gray-900/50 rounded-lg">
+                            <CalendarIcon className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <p className="text-sm text-gray-400">
+                            {new Date(request.startDate).toLocaleDateString()} -{' '}
+                            {new Date(request.endDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg ring-1 ${getStatusColor(
+                            request.status
+                          )}`}
+                        >
+                          {getStatusIcon(request.status)}
+                          <span className="text-sm font-medium capitalize">{request.status}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setCurrentLeave(request);
+                            setNewStatus(request.status);
+                            setIsSlideOverOpen(true);
+                          }}
+                          className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg transition-colors duration-200"
+                        >
+                          <Edit className="w-4 h-4" />
+                          <span>Update</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
       </div>
+
+      {/* Slide-over Panel */}
+      {isSlideOverOpen && currentLeave && (
+        <div className="fixed inset-0 overflow-hidden z-50">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" />
+            <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+              <div className="w-screen max-w-md">
+                <div className="flex h-full flex-col bg-gray-800 shadow-xl">
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                    <h2 className="text-lg font-semibold text-white">Update Leave Request</h2>
+                    <button
+                      onClick={() => setIsSlideOverOpen(false)}
+                      className="rounded-lg p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <XCircle className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-6 py-6">
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                          Employee Email
+                        </label>
+                        <p className="text-white">{currentLeave.employeeEmail}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                          Leave Reason
+                        </label>
+                        <p className="text-white">{currentLeave.reason}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                          Status
+                        </label>
+                        <select
+                          value={newStatus}
+                          onChange={(e) => setNewStatus(e.target.value)}
+                          className="w-full px-4 py-2.5 bg-gray-900/50 rounded-lg ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-white"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3 px-6 py-4 border-t border-white/10">
+                    <button
+                      onClick={() => setIsSlideOverOpen(false)}
+                      className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={updateLeaveStatus}
+                      className="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white transition-colors duration-200"
+                    >
+                      Update Status
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ToastContainer 
+        theme="dark" 
+        position="top-right" 
+        pauseOnHover={false} 
+        limit={1}
+        closeOnClick 
+        autoClose={1500} 
+      />
     </div>
   );
 };
