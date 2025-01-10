@@ -25,6 +25,7 @@ import AdminHolidays from "../Pages/Admins/Dashboard/Holidays";
 import AdminManageEmployees from "../Pages/Admins/Dashboard/Employees";
 import AdminEmployeeProfile from "../Pages/Admins/Dashboard/Employees/EmployeeProfile";
 import AdminLeaveManagement from "../Pages/Admins/Dashboard/Leaves";
+import AdminSalaryManagement from "../Pages/Admins/Dashboard/Salaries";
 
 
 
@@ -99,7 +100,6 @@ const AppRouter = () => {
         />
 
          {/* Admin Routes */}
-
           <Route
           path="/admin/dashboard/home"
           element={
@@ -118,33 +118,6 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/dashboard/history"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminSidebar isActive="History" />
-              <History />
-            </ProtectedRoute>
-          }
-        />
-        <Route 
-          path="/admin/dashboard/settings"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminSidebar isActive="Settings" />
-              <AdminSettings />
-            </ProtectedRoute>
-          }
-        /> 
-        <Route 
-          path="/admin/dashboard/holidays"
-          element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminSidebar isActive="Holidays" />
-              <AdminHolidays />
-            </ProtectedRoute>
-          }
-        /> 
         <Route 
           path="/admin/dashboard/employees"
           element={
@@ -164,6 +137,15 @@ const AppRouter = () => {
           }                 
         />
         <Route 
+          path="/admin/dashboard/salaries"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Salaries" />
+              <AdminSalaryManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
           path="/admin/dashboard/leaves"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
@@ -172,8 +154,24 @@ const AppRouter = () => {
             </ProtectedRoute>
           }                 
         />
-
-        
+        <Route 
+          path="/admin/dashboard/holidays"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Holidays" />
+              <AdminHolidays />
+            </ProtectedRoute>
+          }
+        />            
+        <Route 
+          path="/admin/dashboard/settings"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Settings" />
+              <AdminSettings />
+            </ProtectedRoute>
+          }
+        />            
       </Routes>
   );
 };
