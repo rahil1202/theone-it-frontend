@@ -15,6 +15,8 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { format, parseISO, addDays, subDays } from "date-fns";
+import AbsentEmployees from "./Components/AbsentEmployees";
+import PresentEmployees from "./Components/PresentEmployees";
 
 const AdminAttendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
@@ -112,13 +114,13 @@ const AdminAttendance = () => {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center gap-4 p-4 bg-green-400/10 rounded-lg border border-green-400/20">
+                {/* <div className="flex items-center gap-4 p-4 bg-green-400/10 rounded-lg border border-green-400/20">
                   <UserCheck className="w-8 h-8 text-green-400" />
                   <div>
                     <p className="text-sm text-green-400">Present</p>
                     <p className="text-2xl font-bold text-green-300">{stats.present}</p>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex items-center gap-4 p-4 bg-yellow-400/10 rounded-lg border border-yellow-400/20">
                   <AlertTriangle className="w-8 h-8 text-yellow-400" />
                   <div>
@@ -126,13 +128,13 @@ const AdminAttendance = () => {
                     <p className="text-2xl font-bold text-yellow-300">{stats.late}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-red-400/10 rounded-lg border border-red-400/20">
+                {/* <div className="flex items-center gap-4 p-4 bg-red-400/10 rounded-lg border border-red-400/20">
                   <AlertCircle className="w-8 h-8 text-red-400" />
                   <div>
                     <p className="text-sm text-red-400">Absent</p>
                     <p className="text-2xl font-bold text-red-300">{stats.absent}</p>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -275,8 +277,16 @@ const AdminAttendance = () => {
               </div>
             )}
           </div>
-        </div>
-      </div>
+        </div>     
+      
+      {/* Absent Employees Section */}
+      <AbsentEmployees startDate={selectedDate} endDate={selectedDate} />
+      {/* console.log(startDate, endDate); */}
+
+      {/* Present Employees Section */}
+      <PresentEmployees startDate={selectedDate} endDate={selectedDate} />
+
+      </div>      
       <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} autoClose={2000} />
     </div>
   );
