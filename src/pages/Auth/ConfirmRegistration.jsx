@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 const ConfirmRegistration = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const email = location.state?.email; // Access the passed email
+  const email = location.state?.email;
 
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +32,7 @@ const ConfirmRegistration = () => {
       );
 
       if (response.ok) {
-        toast.success("OTP verified successfully!");
+        toast.success("OTP verified successfully! Please login to continue.");
         navigate("/login");
       } else {
         const errorData = await response.json();

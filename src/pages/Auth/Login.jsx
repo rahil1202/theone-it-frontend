@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import { useAuth } from "../../Contexts/AuthContext"; // Import useAuth from your AuthContext
+import { useAuth } from "../../Contexts/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -62,13 +62,13 @@ const Login = () => {
         toast.success("Login successful! Redirecting to dashboard...");
         if(result.role === "admin") {
           setTimeout(() => {
-            navigate("/admin/dashboard/home");
+            navigate("/admin/dashboard/attendance");
           }, 1000);
           return;
         }        
         else if(result.role === "employee") {
         setTimeout(() => {
-          navigate("/employee/dashboard/home");
+          navigate("/employee/dashboard/attendance");
         }, 1000);
       }
       } else {
@@ -181,7 +181,7 @@ const Login = () => {
         </p>
       </form>
 
-      <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} autoClose={2000} />
+      <ToastContainer theme="dark" position="top-right" pauseOnHover={false} limit={1} autoClose={1500} />
     </div>
   );
 };

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { 
-  Calendar, 
-  Loader2, 
-  Users, 
-  Clock, 
-  Timer, 
+import {
+  Calendar,
+  Loader2,
+  Users,
+  Clock,
+  Timer,
   Filter,
   ChevronLeft,
   ChevronRight,
   AlertCircle,
   Coffee,
-  UserCheck
+  UserCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { format, parseISO, addDays, subDays } from "date-fns";
 
@@ -53,22 +54,22 @@ const AdminAttendance = () => {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case 'present':
-        return 'text-green-400 bg-green-400/10';
-      case 'absent':
-        return 'text-red-400 bg-red-400/10';
-      case 'late':
-        return 'text-yellow-400 bg-yellow-400/10';
+      case "present":
+        return "text-green-400 bg-green-400/10";
+      case "absent":
+        return "text-red-400 bg-red-400/10";
+      case "late":
+        return "text-yellow-400 bg-yellow-400/10";
       default:
-        return 'text-gray-400 bg-gray-400/10';
+        return "text-gray-400 bg-gray-400/10";
     }
   };
 
   const getAttendanceStats = () => {
     const total = attendanceData.length;
-    const present = attendanceData.filter(record => record.currentStatus?.toLowerCase() === 'present').length;
-    const late = attendanceData.filter(record => record.currentStatus?.toLowerCase() === 'late').length;
-    const absent = attendanceData.filter(record => record.currentStatus?.toLowerCase() === 'absent').length;
+    const present = attendanceData.filter(record => record.currentStatus?.toLowerCase() === "present").length;
+    const late = attendanceData.filter(record => record.lateCheckIn === true).length;
+    const absent = attendanceData.filter(record => record.currentStatus?.toLowerCase() === "absent").length;
 
     return { total, present, late, absent };
   };
@@ -119,7 +120,7 @@ const AdminAttendance = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4 p-4 bg-yellow-400/10 rounded-lg border border-yellow-400/20">
-                  <Clock className="w-8 h-8 text-yellow-400" />
+                  <AlertTriangle className="w-8 h-8 text-yellow-400" />
                   <div>
                     <p className="text-sm text-yellow-400">Late</p>
                     <p className="text-2xl font-bold text-yellow-300">{stats.late}</p>
@@ -193,6 +194,7 @@ const AdminAttendance = () => {
                         <th className="px-6 py-4 font-medium">Work Hours</th>
                         <th className="px-6 py-4 font-medium">Break Time</th>
                         <th className="px-6 py-4 font-medium">Status</th>
+                        <th className="px-6 py-4 font-medium">Late Check-in</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
@@ -249,6 +251,16 @@ const AdminAttendance = () => {
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(record.currentStatus)}`}>
                               {record.currentStatus || "Unknown"}
                             </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-300">
+                            {record.lateCheckIn ? (
+                              <div className="flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                                <span>Yes</span>
+                              </div>
+                            ) : (
+                              "No"
+                            )}
                           </td>
                         </tr>
                       ))}

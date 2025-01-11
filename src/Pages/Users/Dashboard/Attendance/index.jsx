@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Clock, LogIn, LogOut, Coffee, StopCircle, Timer, Calendar, Users } from "lucide-react";
+import { Clock, LogIn, LogOut, Coffee, StopCircle, Timer, Calendar, Users, AlertTriangle  } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
+import confetti from "canvas-confetti";
 import "react-toastify/dist/ReactToastify.css";
 
 const Attendance = () => {
@@ -10,13 +11,39 @@ const Attendance = () => {
   const [totalRecessDuration, setTotalRecessDuration] = useState("0 minutes");
   const [totalWorkingTime, setTotalWorkingTime] = useState("0 minutes");
   const [liveWorkingTime, setLiveWorkingTime] = useState("0 minutes");
-  const [loading, setLoading] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10);
-  const [checkoutTimeout, setCheckoutTimeout] = useState(null);
+  const [loading, setLoading] = useState(false);  
   const [currentTime, setCurrentTime] = useState(new Date());
+  
+  const [isLate, setIsLate] = useState(false);
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
+  const triggerConfetti = () => {
+    const end = Date.now() + 3 * 1000; // Reduced duration to 3 seconds
+    const colors = ["#10B981", "#ffffff"]; // Emerald and white to match theme
+    
+    const frame = () => {
+      confetti({
+        particleCount: 2,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors,
+      });
+      confetti({
+        particleCount: 2,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors,
+      });
+ 
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -38,6 +65,8 @@ const Attendance = () => {
       setTotalRecessDuration(data.totalRecessDuration || "0 minutes");
       setTotalWorkingTime(data.totalWorkingTime || "0 minutes");
       setLiveWorkingTime(data.liveWorkingTime || "0 minutes");
+      setIsLate(data.lateCheckIn || false);   
+      // console.log(lateCheckIn)   
     } catch (error) {
       console.error("Error fetching attendance status:", error);
       toast.error(error.message || "Failed to fetch attendance status.");
@@ -45,7 +74,6 @@ const Attendance = () => {
   };
 
   const handleAttendanceAction = async (action) => {
-   
     setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/attendance/${action}`, {
@@ -61,7 +89,8 @@ const Attendance = () => {
         throw new Error(message || `Failed to ${action}`);
       }
 
-      const { attendance, message } = await response.json();
+      const { attendance, message, lateCheckIn } = await response.json();
+      // console.log(lateCheckIn)
 
       setStatus(attendance.currentStatus || "No status available");
       setCheckInTime(attendance.checkInTime);
@@ -92,6 +121,22 @@ const Attendance = () => {
 
       setTotalWorkingTime(totalWorkingTime);
       toast.success(message || `${action} successful`);
+
+      // Show different toast for late check-in
+      // console.log(attendance.lateCheckIn)
+      if (action === 'checkin' && attendance.lateCheckIn) {
+        
+        toast.warning(lateCheckIn || "Late Check-in", {          
+          icon: "⚠️"
+        });
+      } else {
+        toast.success(message || `${action} successful`);
+      }
+      
+      // Trigger confetti for check-in and check-out actions
+      if (action === 'checkin' || action === 'checkout') {
+        triggerConfetti();
+      }
     } catch (error) {
       console.error(`Error during ${action}:`, error.message);
       toast.error(error.message || `Failed to ${action}. Please try again.`);
@@ -99,71 +144,6 @@ const Attendance = () => {
       setLoading(false);
     }
   };
-
-// const initiateCheckout = () => {
-//   const timeout = setTimeout(() => {
-//     // Trigger checkout after 10 seconds
-//     handleAttendanceAction("checkout");
-//     setShowDialog(false); // Close the dialog after checkout is triggered
-//   }, 10000);
-  
-//   setCheckoutTimeout(timeout);
-//   toast.info("Checkout will be processed in 10 seconds. Click 'Cancel' to undo.", {
-//     autoClose: 10000,
-//   });
-// };
-
-// const cancelCheckout = () => {
-//   clearTimeout(checkoutTimeout); // Clear the timeout to prevent checkout
-//   setShowDialog(false); // Close the dialog
-//   setTimeLeft(10); // Reset the timer
-//   toast.info("Checkout canceled.");
-// };
-
-// useEffect(() => {
-//   let timer;
-//   if (showDialog && timeLeft > 0) {
-//     timer = setInterval(() => {
-//       setTimeLeft((prevTime) => prevTime - 1);
-//     }, 1000);
-//   }
-
-//   if (timeLeft === 0) {
-//     // Trigger checkout when timeLeft reaches 0
-//     handleAttendanceAction("checkout");
-//     setShowDialog(false); // Close the dialog when checkout happens
-//   }
-
-//   return () => {
-//     if (timer) clearInterval(timer); // Cleanup the timer on unmount
-//   };
-// }, [showDialog, timeLeft]);
-
-// useEffect(() => {
-//   if (showDialog) {
-//     // Start countdown and checkout process when dialog is shown
-//     initiateCheckout();
-//   }
-
-//   return () => {
-//     // Cleanup timeout when dialog is closed or unmounted
-//     if (checkoutTimeout) {
-//       clearTimeout(checkoutTimeout);
-//     }
-//   };
-// }, [showDialog]);
-
-
-//   useEffect(() => {
-//     if (showDialog) {
-//       initiateCheckout();
-//     }
-//     return () => {
-//       if (checkoutTimeout) {
-//         clearTimeout(checkoutTimeout);
-//       }
-//     };
-//   }, [showDialog]);
 
   useEffect(() => {
     if (status === "Checked In") {
@@ -252,8 +232,16 @@ const Attendance = () => {
               </p>
             </div>
           </div>
-          <div className={`px-6 py-3 rounded-xl ${getStatusColor()} backdrop-blur-sm`}>
-            <span className="font-semibold text-lg">{status || "No Status"}</span>
+          <div className="flex flex-col gap-2 items-end">
+            <div className={`px-6 py-3 rounded-xl ${getStatusColor()} backdrop-blur-sm`}>
+              <span className="font-semibold text-lg">{status || "No Status"}</span>
+            </div>
+            {isLate &&  (
+              <div className="px-4 py-2 rounded-xl bg-yellow-500/20 text-yellow-400 ring-1 ring-yellow-500/50 backdrop-blur-sm flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-sm font-medium">Late Check In</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -265,6 +253,10 @@ const Attendance = () => {
                 <LogIn className="w-5 h-5 text-emerald-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-200">Check-in</h3>
+            </div>
+            <div>
+                <h3 className="text-lg font-semibold text-gray-200">Check-in</h3>
+                {isLate && <span className="text-xs text-yellow-400">Late Arrival</span>}
             </div>
             <p className="text-gray-400">
               {checkInTime ? new Date(checkInTime).toLocaleString() : "Not checked in"}
@@ -326,40 +318,6 @@ const Attendance = () => {
             </button>
           ))}
         </div>
-
-        {/* Checkout Dialog
-        {showDialog && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-sm" />
-            <div className="relative bg-gray-800 rounded-2xl p-8 w-full max-w-md mx-4 ring-1 ring-white/10">
-              <div className="absolute -top-12 left-1/2 -translate-x-1/2">
-                <div className="p-4 bg-red-500/10 rounded-xl ring-1 ring-red-500/30">
-                  <LogOut className="w-8 h-8 text-red-400" />
-                </div>
-              </div>
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-white mt-2">Confirming Checkout</h3>
-                <p className="text-gray-400 mt-2">
-                  Automatic checkout in {timeLeft} seconds
-                </p>
-              </div>
-              <div className="w-full h-1.5 bg-gray-700 rounded-full mb-6 overflow-hidden">
-                <div
-                  className="h-full bg-red-500 rounded-full transition-all duration-1000"
-                  style={{ width: `${(timeLeft / 10) * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={cancelCheckout}
-                  className="px-6 py-3 rounded-xl bg-gray-700/50 hover:bg-gray-700 text-white font-medium transition-colors duration-200 ring-1 ring-white/10"
-                >
-                  Cancel Checkout
-                </button>
-              </div>
-            </div>
-          </div>
-        )} */}
 
         {/* Status Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
