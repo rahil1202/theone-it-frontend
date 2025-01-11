@@ -130,7 +130,8 @@ const Attendance = () => {
           icon: "⚠️"
         });
       } else {
-        toast.success(message || `${action} successful`);
+        // toast.success(message || `${action} successful`);
+        
       }
       
       // Trigger confetti for check-in and check-out actions
