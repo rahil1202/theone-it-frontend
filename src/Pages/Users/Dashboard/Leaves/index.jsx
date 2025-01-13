@@ -11,6 +11,7 @@ import {
   AlertCircle,
   BadgeCheck,
   Ban,
+  SortAsc,
 } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -23,6 +24,7 @@ const Leaves = () => {
   });
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sortOption, setSortOption] = useState('latest'); // Sorting option
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -35,7 +37,7 @@ const Leaves = () => {
       if (!response.ok) throw new Error('Failed to fetch leaves.');
       const { leaves } = await response.json();
       setLeaveRequests(leaves);
-      toast.success('Leaves fetched successfully.');
+      // toast.success('Leaves fetched successfully.');
     } catch (error) {
       console.error('Error fetching leaves:', error);
       toast.error(error.message || 'Failed to fetch leaves.');
@@ -88,11 +90,21 @@ const Leaves = () => {
     return configs[status.toLowerCase()] || configs.pending;
   };
 
-  useEffect(() => {
-    fetchUserLeaves();
-  }, []);
+  // Sorting the leave requests based on selected sort option
+  const sortedRequests = [...leaveRequests].sort((a, b) => {
+    if (sortOption === 'latest') {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortOption === 'oldest') {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    } else if (sortOption === 'approved') {
+      if (a.status.toLowerCase() === 'approved' && b.status.toLowerCase() !== 'approved') return -1;
+      if (a.status.toLowerCase() !== 'approved' && b.status.toLowerCase() === 'approved') return 1;
+      return 0;
+    }
+    return 0;
+  });
 
-  const StatCard = ({ title, value, icon: Icon, colorClass }) => (
+    const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div className={`rounded-xl p-6 ring-1 transform hover:scale-105 transition-all ${colorClass}`}>
       <div className="flex items-center justify-between">
         <div>
@@ -105,6 +117,10 @@ const Leaves = () => {
       </div>
     </div>
   );
+
+  useEffect(() => {
+    fetchUserLeaves();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
@@ -127,7 +143,7 @@ const Leaves = () => {
             </button>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <StatCard
               title="Approved Leaves"
@@ -149,11 +165,27 @@ const Leaves = () => {
             />
           </div>
 
+          {/* Sorting Filter */}
+          <div className="flex justify-end mb-4">
+            <div className="relative">
+              <SortAsc className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="pl-9 pr-4 py-2 bg-gray-900/50 rounded-lg ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none text-sm"
+              >
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
+                <option value="approved">Approved</option>
+              </select>
+            </div>
+          </div>
+
           {/* Leave Requests List */}
           <div className="bg-gray-800/30 rounded-2xl p-6 backdrop-blur-sm ring-1 ring-white/10">
             <h2 className="text-xl font-semibold mb-6">Recent Requests</h2>
             <div className="space-y-4">
-              {leaveRequests.map((request) => {
+              {sortedRequests.map((request) => {
                 const statusConfig = getStatusConfig(request.status);
                 return (
                   <div
@@ -269,7 +301,7 @@ const Leaves = () => {
         position="top-right"
         pauseOnHover={false}
         limit={1}
-        autoClose={2000}        
+        autoClose={2000}
       />
     </div>
   );
