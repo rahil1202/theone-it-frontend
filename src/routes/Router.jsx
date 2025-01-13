@@ -26,6 +26,7 @@ import AdminManageEmployees from "../Pages/Admins/Dashboard/Employees";
 import AdminEmployeeProfile from "../Pages/Admins/Dashboard/Employees/EmployeeProfile";
 import AdminLeaveManagement from "../Pages/Admins/Dashboard/Leaves";
 import AdminSalaryManagement from "../Pages/Admins/Dashboard/Salaries";
+import AdminEmployeeSalaryProfile from "../Pages/Admins/Dashboard/Salaries/EmployeeSalary"
 
 
 
@@ -142,6 +143,15 @@ const AppRouter = () => {
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminSidebar isActive="Salaries" />
               <AdminSalaryManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard/salaries/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSidebar isActive="Salaries" />
+              <AdminEmployeeSalaryProfile />
             </ProtectedRoute>
           }
         />

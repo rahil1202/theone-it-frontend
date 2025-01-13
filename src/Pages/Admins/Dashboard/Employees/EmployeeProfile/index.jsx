@@ -6,7 +6,6 @@ import InformationTab from "./Components/InformationTab";
 import HolidaysTab from "./Components/HolidaysTab";
 import AttendanceTab from "./Components/AttendanceTab";
 import LeaveRequestsTab from "./Components/LeaveRequestsTab";
-import SalaryTab from "./Components/SalaryTab";
 
 const AdminEmployeeProfile = () => {
   const { id } = useParams();
@@ -67,8 +66,7 @@ const AdminEmployeeProfile = () => {
           <TabButton label="Information" tab="information" />
           <TabButton label="Holidays" tab="holidays" />
           <TabButton label="Leave Requests" tab="leaves" />          
-          <TabButton label="Attendance" tab="attendance" />
-          <TabButton label="Salary" tab="salary" />
+          <TabButton label="Attendance" tab="attendance" />          
         </div>
 
         {loading ? (
@@ -80,8 +78,7 @@ const AdminEmployeeProfile = () => {
             {activeTab === "information" && <InformationTab employeeId={id}  />}
             {activeTab === "holidays" && <HolidaysTab employeeId={id} />}
             {activeTab === "leaves" && <LeaveRequestsTab employeeId={id}/>}
-            {activeTab === "attendance" && <AttendanceTab employeeId={id} />}
-            {activeTab === "salary" && <SalaryTab employeeId={id}/>}
+            {activeTab === "attendance" && <AttendanceTab employeeId={id} />}            
           </>
         )}
       </div>
