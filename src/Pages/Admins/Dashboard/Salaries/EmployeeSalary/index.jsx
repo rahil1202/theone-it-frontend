@@ -32,24 +32,26 @@ const AdminEmployeeSalaryProfile = () => {
     totalAbsentDayDeduction: 0,
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleLateCheckinDeduction = (lateDeduction) => {
-    setDeductions(prev => ({
+    setDeductions((prev) => ({
       ...prev,
-      totalLateCheckinDeduction: lateDeduction
+      totalLateCheckinDeduction: lateDeduction,
     }));
   };
 
   const handleHalfDayDeduction = (halfDayDeduction) => {
-    setDeductions(prev => ({
+    setDeductions((prev) => ({
       ...prev,
-      totalHalfDayDeduction: halfDayDeduction
+      totalHalfDayDeduction: halfDayDeduction,
     }));
   };
 
   const handleAbsentDayDeduction = (absentDeduction) => {
-    setDeductions(prev => ({
+    setDeductions((prev) => ({
       ...prev,
-      totalAbsentDayDeduction: absentDeduction
+      totalAbsentDayDeduction: absentDeduction,
     }));
   };
 
@@ -81,6 +83,8 @@ const AdminEmployeeSalaryProfile = () => {
     } catch (error) {
       console.error("Error fetching salary details:", error);
       toast.error("Failed to fetch salary details.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,10 +122,27 @@ const AdminEmployeeSalaryProfile = () => {
     fetchSalaryDetails();
   }, [id]);
 
-  if (!employeeData || salaryData.length === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  if (!employeeData || salaryData.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">No Data Available</h2>
+          <p className="text-gray-400 mb-6">We couldn't find any details for this employee.</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+          >
+            Go Back
+          </button>
+        </div>
       </div>
     );
   }
@@ -142,22 +163,22 @@ const AdminEmployeeSalaryProfile = () => {
           <div className="bg-gray-700/50 p-6 rounded-lg">
             <DollarSign className="w-8 h-8 text-green-400 mb-4" />
             <p className="text-gray-400 mb-2">Base Salary</p>
-            <p className="text-2xl font-bold">₹{salary.baseSalary}</p>
+            <p className="text-2xl font-bold">₹{salary?.baseSalary}</p>
           </div>
           <div className="bg-gray-700/50 p-6 rounded-lg">
             <Info className="w-8 h-8 text-yellow-400 mb-4" />
             <p className="text-gray-400 mb-2">Bonuses</p>
-            <p className="text-2xl font-bold">₹{salary.bonuses}</p>
+            <p className="text-2xl font-bold">₹{salary?.bonuses}</p>
           </div>
           <div className="bg-gray-700/50 p-6 rounded-lg">
             <AlertCircle className="w-8 h-8 text-red-400 mb-4" />
             <p className="text-gray-400 mb-2">Deductions</p>
-            <p className="text-2xl font-bold">₹{salary.deductions}</p>
+            <p className="text-2xl font-bold">₹{salary?.deductions}</p>
           </div>
         </div>
         <div className="bg-gray-700/50 p-6 rounded-lg">
           <p className="text-gray-400 mb-2">Total Salary</p>
-          <p className="text-2xl font-bold">₹{salary.totalSalary}</p>
+          <p className="text-2xl font-bold">₹{salary?.totalSalary}</p>
         </div>
         <button
           onClick={() => handleEdit(salary)}
