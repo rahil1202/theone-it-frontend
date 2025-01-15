@@ -15,7 +15,6 @@ import Leaves from "../Pages/Users/Dashboard/Leaves";
 import Settings from "../Pages/Users/Dashboard/Settings";
 import Attendance from "../Pages/Users/Dashboard/Attendance";
 import Holidays from "../Pages/Users/Dashboard/Holidays";
-
 // Admin Route
 import AdminSidebar from "../Pages/Admins/Dashboard/Sidebar";
 import AdminDashboardHome from "../Pages/Admins/Dashboard/Home";

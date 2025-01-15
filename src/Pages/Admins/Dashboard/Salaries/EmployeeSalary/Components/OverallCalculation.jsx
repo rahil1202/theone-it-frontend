@@ -1,108 +1,150 @@
 import React from "react";
-import { 
-  DollarSign, 
-  AlertCircle, 
-  Trophy, 
-  Clock, 
-  UserMinus, 
+import {
+  DollarSign,
+  AlertCircle,
+  Trophy,
+  Clock,
+  UserMinus,
   CalendarX,
-  ArrowRight 
+  ArrowRight,
+  Info,
 } from "lucide-react";
 
 const OverallCalculation = ({ baseSalary, bonuses, deductions }) => {
   const {
-    lateCheckinsTotalDeduction,
+    totalLateCheckinDeduction,
     totalHalfDayDeduction,
     totalAbsentDayDeduction,
   } = deductions;
-  
+
+  const formatCurrency = (amount) => {
+    const value = Number(amount) || 0;
+    return new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0
+    }).format(value);
+  };
+
   const totalDeductions = 
-    lateCheckinsTotalDeduction + totalHalfDayDeduction + totalAbsentDayDeduction;
-  const finalSalary = baseSalary + bonuses - totalDeductions;
+    (Number(totalLateCheckinDeduction) || 0) + 
+    (Number(totalHalfDayDeduction) || 0) + 
+    (Number(totalAbsentDayDeduction) || 0);
+    
+  const finalSalary = 
+    (Number(baseSalary) || 0) + 
+    (Number(bonuses) || 0) - 
+    totalDeductions;
+
+  const SalaryCard = ({ title, subtitle, amount, icon: Icon, colorClass, prefix = "₹" }) => (
+    <div className="bg-gray-800/40 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 hover:bg-gray-800/60 transition-all duration-300">
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex items-start gap-4">
+          <div className={`p-3 rounded-lg bg-gray-800/80 ${colorClass} ring-1 ring-gray-700/50`}>
+            <Icon className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-gray-100 font-medium tracking-wide">{title}</p>
+            <p className="text-sm text-gray-400 mt-1">{subtitle}</p>
+          </div>
+        </div>
+        <span className={`text-xl font-semibold ${colorClass}`}>
+          {prefix}{formatCurrency(amount)}
+        </span>
+      </div>
+    </div>
+  );
+
+  const DeductionItem = ({ icon: Icon, label, amount }) => (
+    <div className="flex justify-between items-center px-4 py-3 rounded-lg hover:bg-gray-800/40 transition-all">
+      <div className="flex items-center gap-3">
+        <Icon className="w-5 h-5 text-red-400/90" />
+        <span className="text-gray-300">{label}</span>
+      </div>
+      <span className="text-red-400/90 font-medium">-₹{formatCurrency(amount)}</span>
+    </div>
+  );
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 shadow-xl">
-      <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-        <DollarSign className="w-7 h-7 text-indigo-400" />
-        Salary Overview
-      </h2>
+    <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 rounded-2xl p-8 shadow-2xl border border-gray-800">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="bg-indigo-500/10 p-3 rounded-xl">
+            <DollarSign className="w-8 h-8 text-indigo-400" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white tracking-wide">Salary Overview</h2>
+            <p className="text-gray-400 text-sm mt-1">Monthly Breakdown</p>
+          </div>
+        </div>
+        <div className="bg-gray-800/40 px-4 py-2 rounded-lg flex items-center gap-2 text-gray-400 text-sm border border-gray-700/50">
+          <Info className="w-4 h-4" />
+          <span>Current Month</span>
+        </div>
+      </div>
 
       <div className="space-y-6">
-        {/* Base Salary */}
-        <div className="bg-gray-800/50 p-4 rounded-lg hover:bg-gray-800/70 transition-colors">
-          <div className="flex justify-between items-center">
+        <SalaryCard 
+          title="Base Salary"
+          subtitle="Monthly base compensation"
+          amount={baseSalary}
+          icon={DollarSign}
+          colorClass="text-indigo-400"
+        />
+
+        <SalaryCard 
+          title="Bonuses"
+          subtitle="Performance rewards"
+          amount={bonuses}
+          icon={Trophy}
+          colorClass="text-green-400"
+          prefix="+₹"
+        />
+
+        <div className="bg-gray-800/40 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-indigo-500/10 p-2 rounded-lg">
-                <DollarSign className="w-5 h-5 text-indigo-400" />
+              <div className="p-2 rounded-lg bg-red-500/10">
+                <AlertCircle className="w-5 h-5 text-red-400" />
               </div>
-              <div>
-                <p className="text-gray-200 font-medium">Base Salary</p>
-                <p className="text-xs text-gray-400">Monthly base compensation</p>
-              </div>
+              <h3 className="text-gray-200 font-medium">Deductions</h3>
             </div>
-            {/* <span className="text-lg font-semibold text-white">₹{baseSalary.toLocaleString()}</span> */}
+            <span className="text-red-400 font-medium text-lg">-₹{formatCurrency(totalDeductions)}</span>
+          </div>
+
+          <div className="space-y-1">
+            <DeductionItem 
+              icon={Clock}
+              label="Late Check-ins"
+              amount={totalLateCheckinDeduction}
+            />
+            <DeductionItem 
+              icon={UserMinus}
+              label="Half-Days"
+              amount={totalHalfDayDeduction}
+            />
+            <DeductionItem 
+              icon={CalendarX}
+              label="Absences"
+              amount={totalAbsentDayDeduction}
+            />
           </div>
         </div>
 
-        {/* Bonuses */}
-        <div className="bg-gray-800/50 p-4 rounded-lg hover:bg-gray-800/70 transition-colors">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="bg-green-500/10 p-2 rounded-lg">
-                <Trophy className="w-5 h-5 text-green-400" />
+        <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 p-6 rounded-xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-sm transform -skew-x-12 group-hover:skew-x-12 transition-transform duration-700"></div>
+          <div className="relative flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <ArrowRight className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-gray-200 font-medium">Bonuses</p>
-                <p className="text-xs text-gray-400">Performance rewards</p>
+                <p className="text-gray-100 text-sm font-medium">Final Salary</p>
+                <p className="text-white text-3xl font-bold tracking-tight mt-1">
+                  ₹{formatCurrency(finalSalary)}
+                </p>
               </div>
             </div>
-            {/* <span className="text-lg font-semibold text-green-400">+₹{bonuses.toLocaleString()}</span> */}
-          </div>
-        </div>
-
-        {/* Deductions Section */}
-        <div className="bg-gray-800/50 p-4 rounded-lg space-y-4">
-          <h3 className="text-gray-300 font-medium mb-4">Deductions</h3>
-          
-          {/* Late Check-ins */}
-          <div className="flex justify-between items-center pl-2">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-red-400" />
-              <span className="text-gray-300">Late Check-ins</span>
-            </div>
-            {/* <span className="text-red-400 font-medium">-₹{lateCheckinsTotalDeduction.toLocaleString()}</span> */}
-          </div>
-
-          {/* Half-Day */}
-          <div className="flex justify-between items-center pl-2">
-            <div className="flex items-center gap-2">
-              <UserMinus className="w-4 h-4 text-red-400" />
-              <span className="text-gray-300">Half-Days</span>
-            </div>
-            {/* <span className="text-red-400 font-medium">-₹{totalHalfDayDeduction.toLocaleString()}</span> */}
-          </div>
-
-          {/* Absent Days */}
-          <div className="flex justify-between items-center pl-2">
-            <div className="flex items-center gap-2">
-              <CalendarX className="w-4 h-4 text-red-400" />
-              <span className="text-gray-300">Absences</span>
-            </div>
-            {/* <span className="text-red-400 font-medium">-₹{totalAbsentDayDeduction.toLocaleString()}</span> */}
-          </div>
-        </div>
-
-        {/* Final Salary */}
-        <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 p-6 rounded-lg mt-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <ArrowRight className="w-6 h-6 text-white" />
-              <div>
-                <p className="text-gray-200 text-sm">Final Salary</p>
-                {/* <p className="text-white text-2xl font-bold">₹{finalSalary.toLocaleString()}</p> */}
-              </div>
-            </div>
-            <div className="bg-indigo-500/20 p-3 rounded-full">
+            <div className="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
               <AlertCircle className="w-6 h-6 text-white" />
             </div>
           </div>

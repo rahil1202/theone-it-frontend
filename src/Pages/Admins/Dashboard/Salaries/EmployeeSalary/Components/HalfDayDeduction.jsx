@@ -1,42 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { 
-  ClipboardList, 
-  CalendarDays, 
+import PropTypes from "prop-types";
+import {
+  ClipboardList,
+  CalendarDays,
   DollarSign,
   Calendar,
   Clock,
   Sun,
-  AlertCircle
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 
-const HalfDayDeduction = ({ employeeId }) => {
-  const [halfDayData, setHalfDayData] = useState([]);
+const HalfDayDeduction = ({ employeeId, onDataFetched }) => {
+  const [halfDayData, setHalfDayData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [deductions, setDeductions] = useState({
-    halfDays: 0,
-    totalDeduction: 0,
-  });
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
-  const calculateDeductions = (halfDays) => {
-    const totalDeduction = halfDays * 500; // Assuming halfDayDeduction is 500
-    return { halfDays, totalDeduction };
-  };
 
   const fetchHalfDays = async () => {
     try {
       setLoading(true);
 
-      const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-        .toISOString()
-        .split("T")[0];
-      const endDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
-        .toISOString()
-        .split("T")[0];
+      const startDate = `01-${selectedMonth.toString().padStart(2, "0")}-${selectedYear}`;
+      const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+      const endDate = `${lastDay}-${selectedMonth.toString().padStart(2, "0")}-${selectedYear}`;
+
+      const queryParams = new URLSearchParams({
+        employeeId,
+        startDate,
+        endDate,
+      }).toString();
 
       const response = await fetch(
-        `${BASE_URL}/halfday/find?employeeId=${employeeId}&startDate=${startDate}&endDate=${endDate}`,
+        `${BASE_URL}/attendance-summary/employee-halfdays-list?${queryParams}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -44,10 +42,10 @@ const HalfDayDeduction = ({ employeeId }) => {
 
       if (!response.ok) throw new Error("Failed to fetch half-days.");
       const data = await response.json();
-      const deductions = calculateDeductions(data.halfDays?.length || 0);
+      setHalfDayData(data);
+      const totalHalfDayDeduction = data.totalDeduction || 0;
 
-      setHalfDayData(data.halfDays || []);
-      setDeductions(deductions);
+      onDataFetched(data.totalDeduction || 0);
     } catch (error) {
       console.error("Error fetching half-days:", error);
     } finally {
@@ -57,23 +55,34 @@ const HalfDayDeduction = ({ employeeId }) => {
 
   useEffect(() => {
     fetchHalfDays();
-  }, [employeeId]);
+  }, [employeeId, selectedMonth, selectedYear]);
 
   if (loading) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="flex items-center justify-center h-48 bg-gray-900/50 rounded-lg">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+          <p className="text-gray-400">Loading half day data...</p>
+        </div>
       </div>
     );
   }
+
+  if (!halfDayData) return null;
 
   return (
     <div className="bg-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/50">
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Half-Day Deductions</h2>
-          <div className="px-4 py-1 bg-indigo-500/10 rounded-full text-indigo-400 text-sm">
-            Current Month
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-semibold text-white">
+              {halfDayData.employeeName}'s Half-Day Deductions
+            </h2>
+            <div className="px-4 py-1 bg-indigo-500/10 rounded-full text-indigo-400 text-sm">
+              {new Date(selectedYear, selectedMonth - 1).toLocaleString("default", {
+                month: "long",
+              })} {selectedYear}
+            </div>
           </div>
         </div>
 
@@ -85,7 +94,7 @@ const HalfDayDeduction = ({ employeeId }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-400 mb-1">Total Half Days</p>
-                <p className="text-2xl font-bold text-white">{deductions.halfDays}</p>
+                <p className="text-2xl font-bold text-white">{halfDayData.totalHalfDays}</p>
               </div>
             </div>
           </div>
@@ -97,7 +106,7 @@ const HalfDayDeduction = ({ employeeId }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-400 mb-1">Deduction/Day</p>
-                <p className="text-2xl font-bold text-white">₹500</p>
+                <p className="text-2xl font-bold text-white">₹{parseFloat(halfDayData.dailySalary / 2).toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -109,7 +118,7 @@ const HalfDayDeduction = ({ employeeId }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-400 mb-1">Total Deduction</p>
-                <p className="text-2xl font-bold text-white">₹{deductions.totalDeduction}</p>
+                <p className="text-2xl font-bold text-red-400">₹{parseFloat(halfDayData.totalDeduction).toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -120,18 +129,18 @@ const HalfDayDeduction = ({ employeeId }) => {
             <h3 className="text-lg font-medium text-white">Half-Day History</h3>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <CalendarDays className="w-4 h-4" />
-              <span>Past 30 Days</span>
+              <span>{halfDayData.totalDaysInMonth} Days Month</span>
             </div>
           </div>
 
-          {halfDayData.length === 0 ? (
+          {!halfDayData.halfDayDetails?.length ? (
             <div className="text-center py-8">
               <Calendar className="w-12 h-12 text-gray-600 mx-auto mb-3" />
               <p className="text-gray-400">No half-days recorded this month</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {halfDayData.map((entry, index) => (
+              {halfDayData.halfDayDetails.map((entry, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-4 bg-gray-800/40 rounded-lg hover:bg-gray-800/60 transition-all"
@@ -148,9 +157,9 @@ const HalfDayDeduction = ({ employeeId }) => {
                   </div>
                   <div className="flex items-center gap-2 text-gray-400">
                     <Clock className="w-4 h-4" />
-                    <span>Half Day</span>
+                    <span>{entry.hoursWorked} Hours Worked</span>
                     <span className="px-2 py-1 bg-purple-500/10 rounded-full text-purple-400 text-xs ml-2">
-                      -₹500
+                      -₹{(parseFloat(halfDayData.dailySalary) / 2).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -162,5 +171,10 @@ const HalfDayDeduction = ({ employeeId }) => {
     </div>
   );
 };
+
+// HalfDayDeduction.propTypes = {
+//   employeeId: PropTypes.string.isRequired,
+//   onDataFetched: PropTypes.func,
+// };
 
 export default HalfDayDeduction;
